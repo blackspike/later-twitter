@@ -18,21 +18,22 @@ main.wrapper
           label(for="server") Server e.g. @mastodon.social
           input#browser(tabindex="3" v-model="server" placeholder="@mastodon.social" @keyup="updateServer" @blur="generateQR")
 
+    //- Controls
+    aside.controls
+      .btns.hstack.gap-2
+        label.btn(for="uploader") Add image
+        button(@click="deleteThing") Delete item
+        input#uploader(@change="uploadToCanvas" type="file" hidden)
+
+      .grad-buttons
+        button.grad-button(v-for="grad in gradients" :aria-label="grad" @click="addGrad(grad)")
+          img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
+
+      .download
+        button(@click="saveImage") Download Image
+
     //- Fabric
     .fabric
-      //- h2 Preview
-      //- Controls
-      aside.controls
-        input#uploader(@change="uploadToCanvas" type="file" hidden)
-        .hstack.gap-2
-          label.btn(for="uploader") Add image
-          button(@click="deleteThing") Delete item
-
-        .grad-buttons
-          button.grad-button(v-for="grad in gradients" :aria-label="grad" @click="addGrad(grad)")
-            img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
-
-        button(@click="saveImage") Download Image
 
       //- Canvas
       .canvas-wrapper
@@ -294,20 +295,65 @@ const uploadToCanvas = async (e) => {
 }
 
 .layout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-4);
+  display: grid;
   align-items: start;
+  gap: var(--size-4);
+  grid-template-areas: 'input' 'controls' 'image' 'footer';
 }
 
-@media only screen and (min-width: 64rem) {
-  .layout {
-    display: grid;
-    align-items: start;
-    gap: var(--size-4);
-    grid-template-areas: 'input' 'image' 'footer';
+
+.controls {
+  grid-area: controls;
+  display: grid;
+  gap: var(--size-3);
+  grid-template-areas: 'btns download' 'grads grads';
+  width: 100%;
+  justify-content: center;
+  padding-block: var(--size-5) var(--size-3);
+}
+
+@media only screen and (min-width: 45rem) {
+  .controls {
+    grid-template-areas: 'btns grads download';
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+
+}
+
+.grad-buttons {
+  grid-area: grads;
+  align-items: center;
+  grid-auto-flow: column;
+  display: grid;
+  gap: var(--size-2);
+  margin-inline: auto;
+}
+
+.grad-button {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  border: 1px solid black;
+  overflow: hidden;
+
+  &__image {
+    max-width: 32px;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 }
+
+.btns {
+  grid-area: btns;
+}
+
+.download {
+  display: flex;
+  justify-content: flex-end;
+  grid-area: download;
+}
+
 
 .fabric {
   grid-area: image;
@@ -341,21 +387,10 @@ const uploadToCanvas = async (e) => {
 
 @media only screen and (min-width: 45rem) {
 
-  .double {
-    flex-wrap: nowrap;
-  }
-
   .row,
   textarea {
     min-height: 100%;
   }
-}
-
-.button-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--size-2);
-  width: 100%;
 }
 
 .canvas-wrapper {
@@ -375,40 +410,11 @@ const uploadToCanvas = async (e) => {
   }
 }
 
-.controls {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  padding-block: var(--size-5) var(--size-3);
-}
-
 .preview {
   height: 100%;
   width: 100%;
   border-radius: 8px;
   background-color: #444;
-}
-
-.grad-buttons {
-  align-items: center;
-  grid-auto-flow: column;
-  display: grid;
-  gap: var(--size-2);
-}
-
-.grad-button {
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  border: 1px solid black;
-  overflow: hidden;
-
-  &__image {
-    max-width: 32px;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
 }
 
 .url {
