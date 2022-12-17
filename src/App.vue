@@ -13,14 +13,14 @@ main.wrapper
     form.input
       .double
         .row
-          label(for="intro") Intro text
-          input#intro(tabindex="1" v-model="intro" placeholder="e.g. Find me at" @keyup="updateIntro")
-        .row
           label(for="handle") Username e.g. @blackspike
           input#handle(tabindex="2" v-model="handle" placeholder="@username" @keyup="updateHandle" @blur="generateQR")
         .row
           label(for="server") Server e.g. @mastodon.social
           input#browser(tabindex="3" v-model="server" placeholder="@mastodon.social" @keyup="updateServer" @blur="generateQR")
+        .row.row--max
+          label(for="intro") Intro text
+          input#intro(tabindex="1" v-model="intro" placeholder="e.g. Find me at" @keyup="updateIntro")
 
     //- Controls
     aside.controls
@@ -42,8 +42,6 @@ main.wrapper
       //- Canvas
       .canvas-wrapper
         canvas#canvas
-
-
 
     //- output
     .footer
@@ -302,7 +300,7 @@ const uploadToCanvas = async (e) => {
 }
 
 .header {
-  padding-block: var(--size-3);
+  padding-block: var(--size-4);
   margin-block-end: var(--size-8);
   border-bottom: 1px solid #ddd;
   display: flex;
@@ -331,14 +329,25 @@ const uploadToCanvas = async (e) => {
 .controls {
   grid-area: controls;
   display: grid;
-  gap: var(--size-3);
-  grid-template-areas: 'buttons' 'grads' 'download';
+  gap: var(--size-4);
+  grid-template-areas: 'download' 'grads' 'buttons';
   width: 100%;
   padding-block: var(--size-5) var(--size-3);
+  white-space: nowrap;
 }
+
+@media only screen and (min-width: 45rem) {
+  .controls {
+    grid-template-areas: 'buttons download' 'grads grads';
+    grid-template-columns: 1fr 1fr;
+  }
+
+}
+
 
 @media only screen and (min-width: 60rem) {
   .controls {
+    gap: var(--size-3);
     grid-template-areas: 'buttons grads download';
     grid-template-columns: 1fr 2fr 1fr;
     gap: var(--size-10);
@@ -360,6 +369,7 @@ const uploadToCanvas = async (e) => {
   width: 100%;
   border: 1px solid black;
   overflow: hidden;
+  aspect-ratio: 1/1;
 
   &__image {
     height: 100%;

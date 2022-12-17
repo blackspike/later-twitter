@@ -93,6 +93,7 @@ button {
   line-height: 1;
   padding: var(--size-3);
   text-transform: uppercase;
+  text-align: center;
   transition: border-color 0.25s;
   width: 100%;
 }
