@@ -1,0 +1,131 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overscroll-behavior: none;
+  --brand: #8300db;
+}
+
+body {
+  background-color: var(--gray-1);
+  color: #222;
+  display: flex;
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0;
+  min-height: 100vh;
+  padding: 3vmin;
+  place-items: center;
+}
+
+h1 {
+  margin-block: 0 var(--size-7);
+}
+
+h1 a {
+  color: white;
+  text-transform: uppercase;
+  font-size: var(--font-size-0);
+  letter-spacing: 1px;
+  background-color: var(--brand);
+  border-radius: var(--radius-4);
+  padding: var(--size-1) var(--size-3);
+  display: inline-block;
+}
+
+h2 {
+  margin-block: 0;
+  font-size: var(--font-size-3);
+  text-transform: uppercase;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+input,
+textarea {
+  background-color: var(--gray-3);
+  border: 0;
+  border-radius: var(--radius-2);
+  font-size: var(--font-size-3);
+  padding: 0;
+  line-height: 3.5rem;
+  display: flex;
+  padding-inline: 1rem;
+}
+
+input::placeholder {
+  color: var(--gray-6);
+}
+
+textarea {
+  background-color: white;
+  border-radius: var(--radius-3);
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-4);
+  height: 350px;
+  line-height: var(--font-lineheight-2);
+  margin-block-end: var(--size-3);
+  padding: var(--size-5);
+  resize: none;
+}
+
+label {
+  font-weight: var(--font-weight-7);
+  text-transform: uppercase;
+  font-size: var(--font-size-0);
+  display: flex;
+  gap: var(--size-2);
+  line-height: 1;
+}
+
+label.hidden {
+  opacity: 0;
+}
+
+.btn,
+button {
+  line-height: 1;
+  background-color: var(--gray-7);
+  border-radius: var(--radius-2);
+  border: 1px solid transparent;
+  color: var(--gray-1);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-0);
+  font-weight: var(--font-weight-7);
+  padding: var(--size-2);
+  text-transform: uppercase;
+  transition: border-color 0.25s;
+}
+
+@media only screen and (min-width: 64rem) {
+  .btn,
+  button {
+    padding: var(--size-2) var(--size-3);
+  }
+}
+
+.btn--lg {
+  padding: var(--size-3) var(--size-3);
+}
+
+button:hover {
+  background-color: var(--brand);
+}
+
+input:focus,
+textarea:focus,
+button:focus,
+button:focus-visible {
+  outline: 4px auto var(--brand);
+}
+
+[hidden] {
+  display: none;
+}
