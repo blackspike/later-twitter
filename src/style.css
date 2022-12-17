@@ -91,17 +91,10 @@ button {
   font-weight: var(--font-weight-7);
   justify-content: center;
   line-height: 1;
-  padding: var(--size-2);
+  padding: var(--size-3);
   text-transform: uppercase;
   transition: border-color 0.25s;
   width: 100%;
-}
-
-@media only screen and (min-width: 64rem) {
-  .btn,
-  button {
-    padding: var(--size-2) var(--size-3);
-  }
 }
 
 .btn--lg {
