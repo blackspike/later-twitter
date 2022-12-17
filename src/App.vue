@@ -426,7 +426,7 @@ const uploadToCanvas = async (e) => {
   width: 100%;
 }
 
-@media only screen and (min-width: 45rem) {
+@media only screen and (min-width: 60rem) {
 
   .row,
   textarea {
@@ -476,7 +476,7 @@ const uploadToCanvas = async (e) => {
   }
 }
 
-@media only screen and (min-width: 45rem) {
+@media only screen and (min-width: 60rem) {
 
   .footer {
     flex-direction: row;
