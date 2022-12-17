@@ -1,7 +1,11 @@
 
 <template lang="pug">
 main.wrapper
-  h1 👋 Later Twitter
+
+  header.header
+    h1.header__title 👋 Later Twitter
+    .header__intro Generate a Twitter header image with a QR code to your Mastodon page
+
 
   .layout
 
@@ -20,13 +24,13 @@ main.wrapper
 
     //- Controls
     aside.controls
-      .btns.hstack.gap-2
+      .buttons
         label.btn(for="uploader") Add image
         button(@click="deleteThing") Delete item
         input#uploader(@change="uploadToCanvas" type="file" hidden)
 
       .grad-buttons
-        button.grad-button(v-for="grad in gradients" :aria-label="grad" @click="addGrad(grad)")
+        button.grad-button(v-for="grad in gradients" :aria-label="grad" @click="addGrad(grad, true)")
           img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
 
       .download
@@ -43,12 +47,8 @@ main.wrapper
 
     //- output
     .footer
-      .vstack.gap-4
-
-        code.url
-          a(:href="url") {{url}}
-        h1
-          a(href="https://blackspike.com/") By BlackSpike
+      a.footer__link(href="https://ingradients.net/") Gradients by ingradients
+      a.footer__link(href="https://blackspike.com/") By BlackSpike.com
 
 </template>
 
@@ -60,8 +60,8 @@ import { ref, onMounted, computed } from 'vue'
 /* Setups
 ============================= */
 const intro = ref('Follow me on Mastodon')
-const handle = ref('@gregorysherrow')
-const server = ref('@writing.exchange')
+const handle = ref('@username')
+const server = ref('@mastodon.social')
 const gradients = [
   'top-white-ptarmigan.webp',
   'striped-ivory-alligator.webp',
@@ -198,7 +198,7 @@ onMounted(() => {
   handleText.setControlsVisibility(textControlOptions)
   serverText.setControlsVisibility(textControlOptions)
 
-  addGrad()
+  addGrad(randomGrad, true)
 
 })
 
@@ -226,8 +226,7 @@ const deleteThing = () => {
 
 //- Add gradient
 
-const addGrad = (newGrad) => {
-  console.log(newGrad)
+const addGrad = (newGrad, moveable) => {
 
   const objs = canvas.getObjects()
 
@@ -235,18 +234,20 @@ const addGrad = (newGrad) => {
   if (oldGrad) canvas.remove(oldGrad)
 
 
-  fabric.Image.fromURL(`/gradients/${newGrad || randomGrad}`, (grad) => {
-    grad.set('selectable', false)
-    grad.set('name', 'grad')
-    grad.setControlsVisibility({
-      tr: false,
-      bl: false,
-      ml: false,
-      mt: false,
-      mr: false,
-      mb: false,
-      mtr: false
-    })
+  fabric.Image.fromURL(`/gradients/${newGrad}`, (grad) => {
+    if (moveable) {
+      grad.set('selectable', false)
+      grad.set('name', 'grad')
+      grad.setControlsVisibility({
+        tr: false,
+        bl: false,
+        ml: false,
+        mt: false,
+        mr: false,
+        mb: false,
+        mtr: false
+      })
+    }
     canvas.add(grad)
     canvas.sendToBack(grad)
   })
@@ -291,7 +292,6 @@ const uploadToCanvas = async (e) => {
 .wrapper {
   inline-size: min(90vw, 1200px);
   margin-inline: auto;
-  padding-block: var(--size-7);
 }
 
 .layout {
@@ -301,21 +301,47 @@ const uploadToCanvas = async (e) => {
   grid-template-areas: 'input' 'controls' 'image' 'footer';
 }
 
+.header {
+  padding-block: var(--size-3);
+  margin-block-end: var(--size-8);
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  gap: var(--size-6);
+  justify-content: space-between;
+  align-items: center;
+
+  &__title {
+    margin: 0;
+    font-size: var(--font-size-3);
+  }
+
+  &__intro {
+    font-size: var(--font-size-1);
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 60rem) {
+  .header__intro {
+    display: block;
+  }
+
+}
 
 .controls {
   grid-area: controls;
   display: grid;
   gap: var(--size-3);
-  grid-template-areas: 'btns' 'grads' 'download';
+  grid-template-areas: 'buttons' 'grads' 'download';
   width: 100%;
-  justify-content: center;
   padding-block: var(--size-5) var(--size-3);
 }
 
-@media only screen and (min-width: 45rem) {
+@media only screen and (min-width: 60rem) {
   .controls {
-    grid-template-areas: 'btns grads download';
+    grid-template-areas: 'buttons grads download';
     grid-template-columns: 1fr 2fr 1fr;
+    gap: var(--size-10);
   }
 
 }
@@ -326,7 +352,6 @@ const uploadToCanvas = async (e) => {
   grid-auto-flow: column;
   display: grid;
   gap: var(--size-2);
-  margin-inline: auto;
 }
 
 .grad-button {
@@ -337,15 +362,25 @@ const uploadToCanvas = async (e) => {
   overflow: hidden;
 
   &__image {
-    max-width: 32px;
     height: 100%;
     width: 100%;
     object-fit: cover;
   }
+
 }
 
-.btns {
-  grid-area: btns;
+@media only screen and (min-width: 60rem) {
+  .grad-buttons {
+    margin-inline: auto;
+  }
+
+}
+
+.buttons {
+  grid-area: buttons;
+  display: grid;
+  gap: var(--size-3);
+  grid-auto-flow: column;
 }
 
 .download {
@@ -354,8 +389,9 @@ const uploadToCanvas = async (e) => {
   grid-area: download;
 
   &__btn {
-
+    border-radius: var(--radius-round);
     background-color: var(--brand);
+    overflow: hidden;
   }
 }
 
@@ -422,18 +458,28 @@ const uploadToCanvas = async (e) => {
   background-color: #444;
 }
 
-.url {
-  max-width: 90vw;
-  margin-inline: auto;
-  font-size: var(--font-size-fluid-0);
-  -ms-word-break: break-all;
-  word-break: break-all;
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--size-3);
+  padding-block: var(--size-7);
 
-  /* Non standard for WebKit */
-  word-break: break-word;
+  &__link {
+    display: inline-block;
+    width: auto;
+    color: #444;
 
-  -webkit-hyphens: auto;
-  -moz-hyphens: auto;
-  hyphens: auto;
+    &:hover {
+      color: var(--brand);
+    }
+  }
+}
+
+@media only screen and (min-width: 45rem) {
+
+  .footer {
+    flex-direction: row;
+  }
 }
 </style>
