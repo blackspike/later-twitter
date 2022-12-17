@@ -48,7 +48,7 @@ main.wrapper
     //- output
     .footer
       a.footer__link(href="https://ingradients.net/") Gradients by ingradients
-      a.footer__link(href="https://blackspike.com/") By BlackSpike.com
+      a.footer__link(href="https://mastodon.cloud/@felixthehat") By @felixthehat
 
 </template>
 
