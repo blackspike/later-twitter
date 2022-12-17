@@ -30,7 +30,7 @@ main.wrapper
           img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
 
       .download
-        button(@click="saveImage") Download Image
+        button.download__btn(@click="saveImage") Download Image
 
     //- Fabric
     .fabric
@@ -306,7 +306,7 @@ const uploadToCanvas = async (e) => {
   grid-area: controls;
   display: grid;
   gap: var(--size-3);
-  grid-template-areas: 'btns download' 'grads grads';
+  grid-template-areas: 'btns' 'grads' 'download';
   width: 100%;
   justify-content: center;
   padding-block: var(--size-5) var(--size-3);
@@ -352,6 +352,11 @@ const uploadToCanvas = async (e) => {
   display: flex;
   justify-content: flex-end;
   grid-area: download;
+
+  &__btn {
+
+    background-color: var(--brand);
+  }
 }
 
 
