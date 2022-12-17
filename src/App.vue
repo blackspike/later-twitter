@@ -25,23 +25,30 @@ main.wrapper
     .fabric
       //- h2 Preview
       //- Controls
-      aside.controls.button-list
-        label.btn(for="uploader") Add Photo
+      aside.controls
         input#uploader(@change="uploadToCanvas" type="file" hidden)
-        button(@click="deleteThing") Delete selected
-        button(@click="saveImage") Save Image
-        button(@click="generateQR") Add QR
+        .hstack.gap-2
+          label.btn(for="uploader") Add image
+          button(@click="deleteThing") Delete selected
+
+        .grad-buttons
+          button.grad-button(v-for="grad in gradients" :aria-label="grad")
+            img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
+
+        button(@click="saveImage") Download Image
 
       //- Canvas
       .canvas-wrapper
         canvas#canvas
 
 
+
     //- output
-    .output
+    .footer
 
       .row
-        label.hidden(for="output") Preview
+        h4
+          a(:href="url") {{url}}
 
 </template>
 
@@ -55,6 +62,19 @@ import { ref, onMounted, computed } from 'vue'
 const intro = ref('Follow me on Mastodon')
 const handle = ref('@gregorysherrow')
 const server = ref('@writing.exchange')
+const gradients = [
+  'top-white-ptarmigan.webp',
+  'striped-ivory-alligator.webp',
+  'historic-fuchsia-angelfish.webp',
+  'irrelevant-amaranth-guanaco.webp',
+  'fluttering-gray-vulture.webp',
+  'busy-orange-antelope.webp',
+  'cold-orange-constrictor.webp',
+  'applicable-harlequin-llama.webp',
+  'ambitious-rose-orangutan.webp',
+  'accused-white-marlin.webp',
+]
+const randomGrad = gradients[Math.floor(Math.random() * gradients.length)]
 
 const url = computed(() => {
   let urlStr = ''
@@ -69,7 +89,6 @@ const url = computed(() => {
 /* QR
 ============================= */
 const qr = ref('')
-
 
 const generateQR = async () => {
   try {
@@ -98,27 +117,34 @@ const generateQR = async () => {
 
 //- Create and add canvas
 let canvas = null
-const font = 'Arial,sans-serif'
+
+
+const group = new fabric.Group([], {
+  left: 150,
+  top: 100,
+})
+const textOptions = {
+  fontFamily: 'Arial,sans-serif',
+  fill: 'white'
+}
 
 // text
 let introText = new fabric.Text(intro.value, {
   left: 480, top: 310,
-  fontFamily: font,
   fontSize: 26,
-  fill: 'white'
+  ...textOptions
 })
 let handleText = new fabric.Text(handle.value, {
   left: 480, top: 345,
-  fontFamily: font,
   fontSize: 40,
-  fill: 'white'
+  ...textOptions
 })
 // text
 let serverText = new fabric.Text(server.value, {
   left: 480, top: 400,
-  fontFamily: font,
   fontSize: 30,
-  fill: 'white'
+  fontWeight: '700',
+  ...textOptions
 })
 
 const updateIntro = async () => {
@@ -137,6 +163,11 @@ const updateServer = async () => {
   canvas.renderAll()
 }
 
+// Rect
+const rect = new fabric.Rect({
+  height: 344, width: 608, fill: '#151f2b', left: 446, top: 128, rx: 8, ry: 8
+})
+
 // 446
 onMounted(() => {
   canvas = new fabric.Canvas('canvas', {
@@ -146,9 +177,6 @@ onMounted(() => {
   canvas.setWidth(1500)
   canvas.backgroundColor = '#eee'
 
-  const rect = new fabric.Rect({
-    height: 344, width: 608, fill: '#151f2b', left: 446, top: 128, rx: 8, ry: 8
-  })
   canvas.add(rect)
   canvas.add(introText)
   canvas.add(handleText)
@@ -178,16 +206,25 @@ const deleteThing = () => {
 
 //- Add paw of approval
 
-// const addPaw = () => {
-//   fabric.Image.fromURL('https://assets.codepen.io/15455/paw-of-approval.svg', (paw) => {
-//     paw.scale(0.25).set({ left: 50 + Math.random() * 100, top: 50 + Math.random() * 100 })
-//     paw.setControlsVisibility(controls)
-//     canvas.add(paw)
-//     canvas.setActiveObject(paw)
-//   }, { crossOrigin: 'Anonymous' })
-// }
+const addGrad = () => {
+  fabric.Image.fromURL(`/gradients/${randomGrad}`, (grad) => {
+    grad.set('selectable', false)
+    grad.setControlsVisibility({
+      tr: false,
+      bl: false,
+      ml: false,
+      mt: false,
+      mr: false,
+      mb: false,
+      mtr: false
+    })
+    canvas.add(grad)
+    canvas.sendToBack(grad)
+  })
 
-// addPaw()
+}
+
+addGrad()
 
 //- Upload and add image to canvas
 
@@ -234,8 +271,7 @@ const uploadToCanvas = async (e) => {
     display: grid;
     align-items: start;
     gap: var(--size-4);
-    grid-template-areas: 'input output' 'image output';
-    grid-template-columns: 1fr 400px;
+    grid-template-areas: 'input' 'image' 'footer';
   }
 }
 
@@ -243,21 +279,8 @@ const uploadToCanvas = async (e) => {
   grid-area: image;
 }
 
-.output {
-  grid-area: output;
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-5);
-  position: sticky;
-  top: 2rem;
-  width: 100%;
-  margin-inline: auto;
-}
-
-@media only screen and (min-width: 64rem) {
-  .output {
-    max-width: none;
-  }
+.footer {
+  grid-area: footer;
 }
 
 .input {
@@ -320,6 +343,8 @@ const uploadToCanvas = async (e) => {
 
 .controls {
   display: flex;
+  width: 100%;
+  justify-content: space-between;
   padding-block: var(--size-5) var(--size-3);
 }
 
@@ -328,5 +353,27 @@ const uploadToCanvas = async (e) => {
   width: 100%;
   border-radius: 8px;
   background-color: #444;
+}
+
+.grad-buttons {
+  align-items: center;
+  grid-auto-flow: column;
+  display: grid;
+  gap: var(--size-2);
+}
+
+.grad-button {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  border: 1px solid black;
+  overflow: hidden;
+
+  &__image {
+    max-width: 32px;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
 }
 </style>
