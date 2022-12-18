@@ -27,7 +27,7 @@ main.wrapper
       //- Server
       .col
         label(for="server") Server e.g. @mastodon.social
-        input#browser(
+        input#server(
           @blur="generateQR"
           @keyup="updateServer"
           placeholder="@mastodon.social"
