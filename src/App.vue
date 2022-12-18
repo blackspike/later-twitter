@@ -341,18 +341,14 @@ const uploadToCanvas = async (e) => {
     grid-template-areas: 'buttons download' 'grads grads';
     grid-template-columns: 1fr 1fr;
   }
-
 }
-
 
 @media only screen and (min-width: 60rem) {
   .controls {
-    gap: var(--size-3);
     grid-template-areas: 'buttons grads download';
     grid-template-columns: 1fr 2fr 1fr;
-    gap: var(--size-10);
+    gap: var(--size-7);
   }
-
 }
 
 .grad-buttons {
