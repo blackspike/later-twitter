@@ -1,7 +1,7 @@
 {
   "name": "later-twitter",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -9,10 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "1.2.1",
     "fabric": "^5.2.4",
-    "js-base64": "^3.7.3",
-    "node-fetch": "^3.3.0",
     "pug": "^3.0.2",
     "qrcode": "^1.5.1",
     "sass": "^1.57.0",

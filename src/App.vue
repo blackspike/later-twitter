@@ -2,49 +2,75 @@
 <template lang="pug">
 main.wrapper
 
+  //- Header
   header.header
     h1.header__title 👋 Later Twitter
     .header__intro Generate a Twitter header image with a QR code to your Mastodon page
 
-
+  //- Layout
   .layout
 
-    //- form
-    form.input
-      .double
-        .row
-          label(for="handle") Username e.g. @blackspike
-          input#handle(tabindex="2" v-model="handle" placeholder="@username" @keyup="updateHandle" @blur="generateQR")
-        .row
-          label(for="server") Server e.g. @mastodon.social
-          input#browser(tabindex="3" v-model="server" placeholder="@mastodon.social" @keyup="updateServer" @blur="generateQR")
-        .row.row--max
-          label(for="intro") Intro text
-          input#intro(tabindex="1" v-model="intro" placeholder="e.g. Find me at" @keyup="updateIntro")
+    //- Form
+    form.row
+
+      //- Handle
+      .col
+        label(for="handle") Username e.g. @blackspike
+        input#handle(
+          @blur="generateQR"
+          @keyup="updateHandle"
+          placeholder="@username"
+          tabindex="1"
+          v-model="handle"
+        )
+
+      //- Server
+      .col
+        label(for="server") Server e.g. @mastodon.social
+        input#browser(
+          @blur="generateQR"
+          @keyup="updateServer"
+          placeholder="@mastodon.social"
+          tabindex="2"
+          v-model="server"
+        )
+
+      //- Intro
+      .col
+        label(for="intro") Intro text
+        input#intro(
+          @keyup="updateIntro"
+          placeholder="e.g. Find me at"
+          tabindex="3"
+          v-model="intro"
+        )
 
     //- Controls
     aside.controls
+
+      //- Upload
       .buttons
         label.btn(for="uploader") Add image
         button(@click="deleteThing") Delete item
         input#uploader(@change="uploadToCanvas" type="file" hidden)
 
+      //- Gradients
       .grad-buttons
-        button.grad-button(v-for="grad in gradients" :aria-label="grad" @click="addGrad(grad, true)")
+        button.grad-button(v-for="(grad, index) in gradients"
+        :aria-label="`Gradient ${index +1}`"
+        @click="addGrad(grad, true)"
+        )
           img.grad-button__image(:src="`/thumbnails/${grad}`" alt="" height="20" width="20")
 
-      .download
-        button.download__btn(@click="saveImage") Download Image
+      //- Download
+      button.download(@click="saveImage") Download Image
 
-    //- Fabric
-    .fabric
+    //- Canvas
+    .canvas-wrapper
+      canvas#canvas
 
-      //- Canvas
-      .canvas-wrapper
-        canvas#canvas
-
-    //- output
-    .footer
+    //- Footer
+    footer.footer
       a.footer__link(href="https://ingradients.net/") Gradients by ingradients
       a.footer__link(href="https://mastodon.cloud/@felixthehat") App by @felixthehat
 
@@ -74,6 +100,7 @@ const gradients = [
 ]
 const randomGrad = gradients[Math.floor(Math.random() * gradients.length)]
 
+// Concatenate server and handle
 const url = computed(() => {
   let urlStr = ''
   if (server.value.startsWith('@')) {
@@ -86,6 +113,7 @@ const url = computed(() => {
 
 /* QR
 ============================= */
+
 const qr = ref('')
 
 const opts = {
@@ -97,21 +125,22 @@ const opts = {
     light: "#151f2b"
   }
 }
+
 const generateQR = async () => {
   try {
-    // canvas.remove(oImg)
+
+    // Remove old QR
     const objs = canvas.getObjects()
     const oldQr = objs.find(el => el.name === 'qr')
     if (oldQr) canvas.remove(oldQr)
 
-    // create qr
+    // Create QR
     qr.value = await QRCode.toDataURL(url.value, opts)
 
-    // Add qr
+    // Add QR
     fabric.Image.fromURL(qr.value, function (oImg) {
       oImg.set({
-        left: 850, top: 154, height: 180, width: 180, name: 'qr', rx: 8,
-        ry: 8,
+        left: 850, top: 154, height: 180, width: 180, name: 'qr'
       })
       canvas.add(oImg)
     })
@@ -120,17 +149,12 @@ const generateQR = async () => {
   }
 }
 
-/* Fabric
+/* Fabric.js
 ============================= */
 
 //- Create and add canvas
 let canvas = null
 
-
-const group = new fabric.Group([], {
-  left: 150,
-  top: 100,
-})
 const textOptions = {
   fontFamily: 'Arial,sans-serif',
   fill: 'white'
@@ -142,18 +166,20 @@ const textControlOptions = {
   mb: false,
   mtr: false
 }
-// text
+
+// Intro
 let introText = new fabric.Text(intro.value, {
   left: 480, top: 300,
   fontSize: 30,
   ...textOptions
 })
+// Handle
 let handleText = new fabric.Text(handle.value, {
   left: 475, top: 340,
   fontSize: 50,
   ...textOptions
 })
-// text
+// Server
 let serverText = new fabric.Text(server.value, {
   left: 480, top: 408,
   fontSize: 30,
@@ -161,6 +187,7 @@ let serverText = new fabric.Text(server.value, {
   ...textOptions
 })
 
+// Update canvas text
 const updateIntro = async () => {
   introText.set('text', intro.value)
   canvas.renderAll()
@@ -174,7 +201,7 @@ const updateServer = async () => {
   canvas.renderAll()
 }
 
-// Rect
+// Card background
 const rect = new fabric.Rect({
   height: 344, width: 608, fill: '#151f2b', left: 446, top: 128, rx: 8, ry: 8
 })
@@ -192,10 +219,12 @@ onMounted(() => {
 
   canvas.add(rect, introText, handleText, serverText)
 
+  // Disallow text to be squished
   introText.setControlsVisibility(textControlOptions)
   handleText.setControlsVisibility(textControlOptions)
   serverText.setControlsVisibility(textControlOptions)
 
+  // Add random bg
   addGrad(randomGrad, true)
 
 })
@@ -226,12 +255,12 @@ const deleteThing = () => {
 
 const addGrad = (newGrad, moveable) => {
 
+  // Remove old
   const objs = canvas.getObjects()
-
   const oldGrad = objs.find(el => el.name === 'grad')
   if (oldGrad) canvas.remove(oldGrad)
 
-
+  // Open gradient from public
   fabric.Image.fromURL(`/gradients/${newGrad}`, (grad) => {
     if (moveable) {
       grad.set('selectable', false)
@@ -252,10 +281,12 @@ const addGrad = (newGrad, moveable) => {
 
 }
 
-//- Upload and add image to canvas
+//- Upload  image to canvas
 
 const uploadToCanvas = async (e) => {
+
   const reader = new FileReader()
+
   reader.onload = function (e) {
     let image = new Image()
     image.src = e.target.result
@@ -265,7 +296,6 @@ const uploadToCanvas = async (e) => {
         left: 0,
         top: 0
       })
-      // img.scaleToHeight(500)
       canvas.add(img).renderAll()
       canvas.sendToBack(img)
       canvas.bringForward(img)
@@ -274,17 +304,13 @@ const uploadToCanvas = async (e) => {
   reader.readAsDataURL(e.target.files[0])
 }
 
-// Upload to cloudflare
-
-
 </script>
 
 <style lang="scss">
 @import "https://unpkg.com/open-props";
 
-
 #app {
-  width: 100%;
+  inline-size: 100%;
 }
 
 .wrapper {
@@ -293,29 +319,33 @@ const uploadToCanvas = async (e) => {
 }
 
 .layout {
-  display: grid;
   align-items: start;
+  display: grid;
   gap: var(--size-4);
   grid-template-areas: 'input' 'controls' 'image' 'footer';
 }
 
+// Header
+
 .header {
-  padding-block: var(--size-4);
-  margin-block-end: var(--size-8);
-  border-bottom: 1px solid #ddd;
+  align-items: center;
+  border-bottom: 1px solid var(--gray-3);
   display: flex;
   gap: var(--size-6);
   justify-content: space-between;
-  align-items: center;
+  margin-block-end: var(--size-8);
+  padding-block: var(--size-4);
 
   &__title {
+    font-size: var(--font-size-4);
+    letter-spacing: var(--font-letterspacing-0);
     margin: 0;
-    font-size: var(--font-size-3);
   }
 
   &__intro {
-    font-size: var(--font-size-1);
+    color: var(--gray-6);
     display: none;
+    font-size: var(--font-size-1);
   }
 }
 
@@ -323,17 +353,17 @@ const uploadToCanvas = async (e) => {
   .header__intro {
     display: block;
   }
-
 }
 
+// Controls
+
 .controls {
-  grid-area: controls;
   display: grid;
   gap: var(--size-4);
+  grid-area: controls;
   grid-template-areas: 'download' 'grads' 'buttons';
-  width: 100%;
+  inline-size: 100%;
   padding-block: var(--size-5) var(--size-3);
-  white-space: nowrap;
 }
 
 @media only screen and (min-width: 45rem) {
@@ -345,136 +375,122 @@ const uploadToCanvas = async (e) => {
 
 @media only screen and (min-width: 60rem) {
   .controls {
+    gap: var(--size-7);
     grid-template-areas: 'buttons grads download';
     grid-template-columns: 1fr 2fr 1fr;
-    gap: var(--size-7);
   }
 }
 
+// Grad buttons
+
 .grad-buttons {
-  grid-area: grads;
   align-items: center;
-  grid-auto-flow: column;
   display: grid;
   gap: var(--size-2);
+  grid-area: grads;
+  grid-auto-flow: column;
 }
 
 .grad-button {
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  border: 1px solid black;
-  overflow: hidden;
   aspect-ratio: 1/1;
+  border: 2px solid var(--gray-9);
+  block-size: 100%;
+  inline-size: 100%;
+  overflow: hidden;
+  padding: 0;
 
   &__image {
     height: 100%;
-    width: 100%;
+    inline-size: 100%;
     object-fit: cover;
   }
 
+  &:hover {
+    border-color: var(--brand);
+  }
 }
+
 
 @media only screen and (min-width: 60rem) {
   .grad-buttons {
     margin-inline: auto;
   }
-
 }
 
 .buttons {
-  grid-area: buttons;
   display: grid;
   gap: var(--size-3);
+  grid-area: buttons;
   grid-auto-flow: column;
 }
 
 .download {
-  display: flex;
-  justify-content: flex-end;
+  background-color: var(--brand);
   grid-area: download;
 
-  &__btn {
-    border-radius: var(--radius-round);
-    background-color: var(--brand);
-    overflow: hidden;
+  &:hover {
+    background-color: var(--gray-9);
   }
 }
 
 
-.fabric {
-  grid-area: image;
-}
+// Rows n cols
 
-.footer {
-  grid-area: footer;
-}
-
-.input {
-  grid-area: input;
+.col {
   display: flex;
   flex-direction: column;
-  gap: var(--size-5);
+  flex: 1;
+  gap: var(--size-2);
+  inline-size: 100%;
 }
 
 .row {
   display: flex;
-  flex-direction: column;
-  gap: var(--size-2);
-  width: 100%;
-  flex: 1;
-}
-
-.double {
-  display: flex;
   flex-wrap: wrap;
   gap: var(--size-5);
-  width: 100%;
+  inline-size: 100%;
 }
 
 @media only screen and (min-width: 60rem) {
-
-  .row,
-  textarea {
+  .row {
     min-height: 100%;
   }
 }
 
+// Canvas
+
 .canvas-wrapper {
-  width: 100%;
-  border-radius: 8px;
-  background-color: #ddd;
-  padding: .5rem;
+  background-color: var(--gray-4);
+  border-radius: var(--radius-2);
   display: flex;
+  grid-area: image;
+  inline-size: 100%;
   justify-content: center;
+  padding: var(--size-2);
 
   .canvas-container,
   canvas {
-    max-width: calc(100vw - calc(var(--size-7)));
     aspect-ratio: 3/1;
-    width: 100% !important;
-    height: auto !important;
+    block-size: auto !important;
+    max-width: calc(100vw - calc(var(--size-7)));
+    inline-size: 100% !important;
   }
 }
 
-.preview {
-  height: 100%;
-  width: 100%;
-  border-radius: 8px;
-  background-color: #444;
-}
+// Footer
 
 .footer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  grid-area: footer;
   gap: var(--size-3);
   padding-block: var(--size-7);
 
   &__link {
+    color: var(--gray-6);
     display: inline-block;
-    width: auto;
-    color: #444;
+    inline-size: auto;
 
     &:hover {
       color: var(--brand);
@@ -483,7 +499,6 @@ const uploadToCanvas = async (e) => {
 }
 
 @media only screen and (min-width: 60rem) {
-
   .footer {
     flex-direction: row;
   }
