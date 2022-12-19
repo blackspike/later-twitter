@@ -2,4 +2,4 @@
 
 A little app to make it easier to create leaving twitter header images!!
 
-[Screenshot](/public/screenhot.jpg)
+![Screenshot](/public/screenshot.jpg)
