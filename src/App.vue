@@ -19,9 +19,10 @@ main.wrapper
         input#handle(
           @blur="generateQR"
           @keyup="updateHandle"
+          @paste="updateHandle"
           placeholder="@username"
           tabindex="1"
-          v-model="handle"
+          v-model.trim="handle"
         )
 
       //- Server
@@ -30,9 +31,10 @@ main.wrapper
         input#server(
           @blur="generateQR"
           @keyup="updateServer"
+          @paste="updateServer"
           placeholder="@mastodon.social"
           tabindex="2"
-          v-model="server"
+          v-model.trim="server"
         )
 
       //- Intro
@@ -40,9 +42,10 @@ main.wrapper
         label(for="intro") Intro text
         input#intro(
           @keyup="updateIntro"
+          @paste="updateIntro"
           placeholder="e.g. Find me at"
           tabindex="3"
-          v-model="intro"
+          v-model.trim="intro"
         )
 
     //- Controls
@@ -72,6 +75,7 @@ main.wrapper
     //- Footer
     footer.footer
       a.footer__link(href="https://ingradients.net/") Gradients by ingradients
+      a.footer__link(href="https://plausible.io/latertwitter.cyou/") Stats
       a.footer__link(href="https://mastodon.cloud/@felixthehat") App by @felixthehat
 
 </template>
@@ -118,11 +122,11 @@ const qr = ref('')
 
 const opts = {
   type: 'image/png',
-  width: 180,
+  width: 720,
   margin: 0,
   color: {
     dark: "#fff",
-    light: "#151f2b"
+    light: "#ffffff00"
   }
 }
 
@@ -139,8 +143,9 @@ const generateQR = async () => {
 
     // Add QR
     fabric.Image.fromURL(qr.value, function (oImg) {
+      oImg.scale(.25)
       oImg.set({
-        left: 850, top: 154, height: 180, width: 180, name: 'qr'
+        left: 850, top: 154, name: 'qr',
       })
       canvas.add(oImg)
     })
@@ -492,6 +497,7 @@ const uploadToCanvas = async (e) => {
     display: inline-block;
     inline-size: auto;
 
+
     &:hover {
       color: var(--brand);
     }
@@ -501,6 +507,11 @@ const uploadToCanvas = async (e) => {
 @media only screen and (min-width: 60rem) {
   .footer {
     flex-direction: row;
+
+    &__link:last-of-type {
+      flex: 2;
+      text-align: end;
+    }
   }
 }
 </style>
