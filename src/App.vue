@@ -76,7 +76,8 @@ main.wrapper
     footer.footer
       a.footer__link(href="https://ingradients.net/") Gradients by ingradients
       a.footer__link(href="https://plausible.io/latertwitter.cyou/") Stats
-      a.footer__link(href="https://mastodon.cloud/@felixthehat") App by @felixthehat
+      a.footer__link(href="https://github.com/blackspike/later-twitter") GitHub
+      a.footer__link(href="https://mastodon.cloud/@felixthehat") By @felixthehat
 
 </template>
 
